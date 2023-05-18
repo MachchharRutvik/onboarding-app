@@ -13,34 +13,77 @@ import Confirmation from './onBoardingFormComponents/Confirmation';
 import { makeStyles } from '@mui/styles';
 import { useState } from 'react';
 // import Typography from "@mui/material/Typography";
+// const useStyles = makeStyles((theme) => ({
+//   root: {
+//     width: '100%',
+//     backgroundColor: 'transparent',
+//   },
+//   stepper: {
+//     backgroundColor: 'transparent',
+//     // change icon color for all steps
+//     '& .MuiStepIcon-root': {
+//       color: 'var(--my-disabled-step-color)', // Customize the color of the Stepper icon
+//     },
+//     '& .MuiStepIcon-active': {
+//       color: 'var(--my-brand-color-dark)', // Customize the color of the active Stepper icon
+//     },
+//     '& .MuiStepIcon-completed': {
+//       color: 'var(--my-brand-color-dark)', // Customize the color of the completed Stepper icon
+//     },
+
+//     // change label color for all steps
+//     '& .MuiStepLabel-label': {
+//       color: 'var(--my-disabled-step-color)', // Customize the color of the StepLabel text
+//     },
+
+//     '& .MuiStepLabel-active': {
+//       color: 'var(--my-brand-color-dark)', // Customize the color of the active StepLabel text
+//     },
+//     '& .MuiStepLabel-completed': {
+//       color: 'var(--my-brand-color-dark)', // Customize the color of the completed StepLabel text
+//     },
+    
+//     // change connector color for all steps
+//     '& .MuiStepConnector-line': {
+//       borderColor: 'var(--my-disabled-step-color)', // Customize the color of the StepConnector line
+//     },
+//     // change connector color for active steps
+//     '& .MuiStepConnector-active': {
+//       '& .MuiStepConnector-line': {
+//         borderColor: 'var(--my-brand-color-dark)', // Customize the color of the active StepConnector line
+//       }
+//     }
+//   },
+// }));
 const useStyles = makeStyles((theme) => ({
   root: {
+    marginTop:"0px",
     width: '100%',
-    backgroundColor: 'transparent',
+    // backgroundColor: 'transparent',
   },
   stepper: {
     backgroundColor: 'transparent',
     // change icon color for all steps
     '& .MuiStepIcon-root': {
-      color: 'var(--my-disabled-step-color)', // Customize the color of the Stepper icon
+      color: '#FF9933', // Customize the color of the Stepper icon
     },
     '& .MuiStepIcon-active': {
-      color: 'var(--my-brand-color-dark)', // Customize the color of the active Stepper icon
+      color: '#FF9933', // Customize the color of the active Stepper icon
     },
     '& .MuiStepIcon-completed': {
-      color: 'var(--my-brand-color-dark)', // Customize the color of the completed Stepper icon
+      color: '#FF9933', // Customize the color of the completed Stepper icon
     },
 
     // change label color for all steps
     '& .MuiStepLabel-label': {
-      color: 'var(--my-disabled-step-color)', // Customize the color of the StepLabel text
+      color: '#FF9933', // Customize the color of the StepLabel text
     },
 
     '& .MuiStepLabel-active': {
-      color: 'var(--my-brand-color-dark)', // Customize the color of the active StepLabel text
+      color: '#FF9933', // Customize the color of the active StepLabel text
     },
     '& .MuiStepLabel-completed': {
-      color: 'var(--my-brand-color-dark)', // Customize the color of the completed StepLabel text
+      color: '#FF9933', // Customize the color of the completed StepLabel text
     },
     
     // change connector color for all steps

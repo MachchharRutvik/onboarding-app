@@ -29,22 +29,38 @@ export const personalDetailsValidation = Yup.object({
     educationDetails:Yup.array().of(
         Yup.object().shape({
             educationType: Yup.string().required("Education type is required"),
-            instituteName: Yup.string().required("Institute name is required"),
-            course: Yup.string().required("Course is required"),
-            cgpa: Yup.string().required("CGPA/Percentage is required"),
-            passingYear: Yup.string().required("Passing year is required"),
+            // instituteName: Yup.string().required("Institute name is required"),
+            // course: Yup.string().required("Course is required"),
+            // cgpa: Yup.string().required("CGPA/Percentage is required"),
+            // passingYear: Yup.string().required("Passing year is required"),
         })
     ),
     experienceDetails:Yup.array().of(
       Yup.object().shape({
-        totalExperience: Yup.string().required("Total experience is required"),
-        company: Yup.string().required("Company is required"),
-        designation: Yup.string().required("Designation is required"),
-        technology: Yup.string().required("Technology is required"),
-        fromDate: Yup.string().required("From date is required"),
-        toDate: Yup.string().required("To date is required"),
-        reasonForJobChange: Yup.string().required("Reason for job change is required"),
-        checkBox: Yup.string().required("Checkbox is required"),
+        // totalExperience: Yup.string().required("Total experience is required"),
+        // company: Yup.string().required("Company is required"),
+        // designation: Yup.string().required("Designation is required"),
+        // technology: Yup.string().required("Technology is required"),
+        // fromDate: Yup.string().required("From date is required"),
+        // toDate: Yup.string().required("To date is required"),
+        // reasonForJobChange: Yup.string().required("Reason for job change is required"),
+        // checkBox: Yup.string().required("Checkbox is required"),
       })
     )
   }) 
+  export const documentsValidation = Yup.object().shape({
+    educationCertificates: Yup.array().of(Yup.object().shape({
+      document: Yup.string().required("Document type is required"),
+      documentName: Yup.string().required("Document name is required"),
+    })),
+    adharNumber: Yup.string().required("Adhaar number is required"),
+    adharDocument: Yup.mixed().required("Adhaar document is required"),
+    panCardNumber: Yup.string().required("Pan card is required"),
+    panCardDocument: Yup.mixed().required("Pan card document is required"),
+    presentAddress: Yup.string().required("Present address is required"),
+    permanentAddress: Yup.string().required("Permanent address is required"),
+    latestExperienceLetter: Yup.mixed().required("Latest experience letter is required"),
+    latestRelievingLetter: Yup.mixed().required("Latest relieving letter is required"),
+    salarySlips: Yup.mixed().required("Salary slips is required"),
+    form16: Yup.mixed().required("Form 16 is required"),
+  })
