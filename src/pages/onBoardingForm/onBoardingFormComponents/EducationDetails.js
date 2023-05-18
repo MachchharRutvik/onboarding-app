@@ -10,6 +10,7 @@ import { TextField } from "@mui/material";
 import {MenuItem,Select,FormControl,InputLabel} from "@mui/material";
 import { educationDetailsValidation } from "../../../validation/ValidationSchema";
 
+
 function EducationDetails({ activeStep, handleNext, handleBack, steps,educationDetailsData,setEducationDetailsData }) {
   const educationTypes = [
     "High School Diploma",
@@ -29,6 +30,25 @@ function EducationDetails({ activeStep, handleNext, handleBack, steps,educationD
 
   const passingYears = ['2011-12', '2012-13', '2013-14', '2014-15', '2015-16', '2016-17', '2017-18', '2018-19', '2019-20', '2020-21'];
 
+  const experience = ['0-1','2-5','5-10','10+']
+  const technologies = [
+    'HTML',
+    'CSS',
+    'JavaScript',
+    'React',
+    'Angular',
+    'Vue.js',
+    'Node.js',
+    'Express',
+    'MongoDB',
+    'MySQL',
+    'PostgreSQL',
+    'Python',
+    'Java',
+    'Ruby',
+    'PHP'
+  ]
+  
 
   
   const initialValues = {
@@ -352,16 +372,17 @@ console.log(formik.errors)
         {formik.values.experienceDetails.map((item,index)=>(
           <Grid container spacing={2} padding={3} key={index}>
           <Grid item xs={3}>
-                <TextField
-                  fullWidth
-                  name={`experienceDetails[${index}].totalExperience`}
-                  placeholder=""
-                  label="Total Experience"
-                  type="text"
-                  onBlur={formik.handleBlur}
-                  onChange={formik.handleChange}
-                  value={formik.values.experienceDetails[index].totalExperience}
-                  error={
+          <FormControl fullWidth>
+                  <InputLabel id="demo-simple-select-label">Experience</InputLabel>
+                  <Select
+                    labelId="demo-simple-select-label"
+                    id="totalExperience"
+                    value={formik.values.experienceDetails[index].totalExperience}
+                    label="Experience"
+                    name={`experienceDetails[${index}].totalExperience`}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    error={
                     formik.errors.experienceDetails &&
                     formik.errors.experienceDetails[index] &&
                     formik.errors.experienceDetails[index].totalExperience &&
@@ -369,17 +390,25 @@ console.log(formik.errors)
                     formik.touched.experienceDetails[index] &&
                     formik.touched.experienceDetails[index].totalExperience
                   }
-                  helperText={
+                 
+                  >
+                    {experience.map((type,index)=>
+                      <MenuItem key={index} value={type}>{type}</MenuItem>
+                    )}
+                  </Select>
+                  {
                     formik.errors.experienceDetails &&
                     formik.errors.experienceDetails[index] &&
                     formik.errors.experienceDetails[index].totalExperience &&
                     formik.touched.experienceDetails &&
                     formik.touched.experienceDetails[index] &&
-                    formik.touched.experienceDetails[index].totalExperience
-                      ? formik.errors.experienceDetails[index].totalExperience
-                      : null
+                    formik.touched.experienceDetails[index].totalExperience &&
+                    <FormHelperText style={{ color: "red" }}>
+                  {formik.errors.experienceDetails[index].totalExperience}
+                </FormHelperText>
+                      
                   }
-                />
+                </FormControl>
               </Grid>
           <Grid item xs={3}>
                 <TextField
@@ -442,16 +471,17 @@ console.log(formik.errors)
                 />
               </Grid>
           <Grid item xs={3}>
-                <TextField
-                  fullWidth
-                  name={`experienceDetails[${index}].technology`}
-                  placeholder=""
-                  label="Technology"
-                  type="text"
-                  onBlur={formik.handleBlur}
-                  onChange={formik.handleChange}
-                  value={formik.values.experienceDetails[index].technology}
-                  error={
+          <FormControl fullWidth>
+                  <InputLabel id="demo-simple-select-label">Technology</InputLabel>
+                  <Select
+                    labelId="demo-simple-select-label"
+                    id="technology"
+                    value={formik.values.experienceDetails[index].technology}
+                    label="Technology"
+                    name={`experienceDetails[${index}].technology`}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    error={
                     formik.errors.experienceDetails &&
                     formik.errors.experienceDetails[index] &&
                     formik.errors.experienceDetails[index].technology &&
@@ -459,17 +489,25 @@ console.log(formik.errors)
                     formik.touched.experienceDetails[index] &&
                     formik.touched.experienceDetails[index].technology
                   }
-                  helperText={
+                 
+                  >
+                    {technologies.map((type,index)=>
+                      <MenuItem key={index} value={type}>{type}</MenuItem>
+                    )}
+                  </Select>
+                  {
                     formik.errors.experienceDetails &&
                     formik.errors.experienceDetails[index] &&
                     formik.errors.experienceDetails[index].technology &&
                     formik.touched.experienceDetails &&
                     formik.touched.experienceDetails[index] &&
-                    formik.touched.experienceDetails[index].technology
-                      ? formik.errors.experienceDetails[index].technology
-                      : null
+                    formik.touched.experienceDetails[index].technology &&
+                    <FormHelperText style={{ color: "red" }}>
+                  {formik.errors.experienceDetails[index].technology}
+                </FormHelperText>
+                      
                   }
-                />
+                </FormControl>
               </Grid>
           <Grid item xs={3}>
                 <TextField
