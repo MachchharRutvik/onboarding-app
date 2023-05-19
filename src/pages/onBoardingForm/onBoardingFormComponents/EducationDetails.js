@@ -177,7 +177,7 @@ function EducationDetails({
   const formik = useFormik({
     initialValues,
     onSubmit,
-    validationSchema: educationDetailsValidation,
+    // validationSchema: educationDetailsValidation,
   });
   useEffect(() => {
     if (educationDetailsData != null) {

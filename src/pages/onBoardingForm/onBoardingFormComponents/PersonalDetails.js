@@ -86,7 +86,7 @@ function PersonalDetails({handleNext,handleBack,steps,activeStep,isPersonalDetai
   const formik = useFormik({
     initialValues,
     onSubmit,
-    validationSchema:personalDetailsValidation,
+    // validationSchema:personalDetailsValidation,
   });
   
   //   console.log(formik.errors);
