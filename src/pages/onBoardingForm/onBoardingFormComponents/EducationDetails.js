@@ -8,10 +8,12 @@ import { Grid } from "@mui/material";
 import { Paper } from "@mui/material";
 import { TextField } from "@mui/material";
 import { MenuItem, Select, FormControl, InputLabel } from "@mui/material";
-import { educationDetailsValidation } from "../../../validation/ValidationSchema";
+
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Checkbox from "@mui/material/Checkbox";
 import { makeStyles } from "@mui/styles";
+import { v4 as uuid } from "uuid";
+import { educationDetailsValidation } from "../../../validation/EducationDetailsSchema";
 
 const useStyles = makeStyles((theme) => ({
   textField: {
@@ -42,6 +44,11 @@ function EducationDetails({
   setEducationDetailsData,
 }) {
   const classes = useStyles();
+
+  useEffect(() => {
+    setAllTheData();
+   }, []);
+  
   const educationTypes = [
     "High School Diploma",
     "Associate's Degree",
@@ -93,6 +100,7 @@ function EducationDetails({
   const initialValues = {
     educationDetails: [
       {
+        id: uuid(),
         educationType: "",
         instituteName: "",
         course: "",
@@ -100,18 +108,7 @@ function EducationDetails({
         passingYear: "",
       },
     ],
-    experienceDetails: [
-      {
-        totalExperience: "",
-        company: "",
-        designation: "",
-        technology: "",
-        fromDate: "",
-        toDate: "",
-        reasonForJobChange: "",
-        checkBox: false,
-      },
-    ],
+    totalExperience: "0",
   };
   const handleAddFields = () => {
     formik.setValues({
@@ -119,6 +116,7 @@ function EducationDetails({
       educationDetails: [
         ...formik.values.educationDetails,
         {
+          id: uuid(),
           educationType: "",
           instituteName: "",
           course: "",
@@ -134,7 +132,7 @@ function EducationDetails({
       experienceDetails: [
         ...formik.values.experienceDetails,
         {
-          totalExperience: "",
+          id: uuid(),
           company: "",
           designation: "",
           technology: "",
@@ -146,45 +144,88 @@ function EducationDetails({
       ],
     });
   };
-  const handleRemoveExperience = (index) => {
-    if (index === 0) {
-      return;
-    }
-    const experienceDetails = [...formik.values.experienceDetails];
-    experienceDetails.splice(index, 1);
-    formik.setValues({
-      ...formik.values,
-      experienceDetails,
-    });
-  };
-  const handleRemoveFields = (index) => {
-    if (index === 0) {
-      return;
-    }
-    const educationDetails = [...formik.values.educationDetails];
-    educationDetails.splice(index, 1);
-    formik.setValues({
-      ...formik.values,
-      educationDetails,
-    });
-  };
 
+  const handleRemoveFields = (id) => {
+    let educationArray = formik.values.educationDetails.filter((ele) => {
+      return ele.id !== id;
+    });
+    formik.setValues({
+      ...formik.values,
+      educationDetails: educationArray,
+    });
+  };
+  const handleRemoveExperience = (id) => {
+    console.log(id);
+    if (formik.values.experienceDetails.length > 1) {
+      let experienceArray = formik.values.experienceDetails.filter((ele) => {
+        return ele.id !== id;
+      });
+      formik.setValues({
+        ...formik.values,
+        experienceDetails: experienceArray,
+      });
+    }
+  };
   const onSubmit = (values) => {
-    console.log(values);
     setEducationDetailsData(values);
     handleNext();
   };
+  const handleBackButton = () => {
+    setEducationDetailsData(formik.values);
+    handleBack();
+  }
   const formik = useFormik({
     initialValues,
     onSubmit,
-    // validationSchema: educationDetailsValidation,
+    validationSchema: educationDetailsValidation,
   });
-  useEffect(() => {
+
+
+  const setAllTheData =()=>{
     if (educationDetailsData != null) {
       formik.setValues(educationDetailsData);
     }
-  }, []);
-  console.log(formik.errors);
+  }
+
+  const handleChangeOfTotalExperience = (event) => {
+    
+    const totalExperienceString = event.target.value;
+    const totalExperience = parseInt(totalExperienceString);
+
+    formik.setFieldValue("totalExperience", totalExperienceString);
+
+    if (totalExperience > 0 && totalExperience <= 50) {
+      formik.setFieldValue("experienceDetails", [
+        {
+          id: uuid(),
+          company: "",
+          designation: "",
+          technology: "",
+          fromDate: "",
+          toDate: "",
+          reasonForJobChange: "",
+          checkBox: false,
+        },
+      ]);
+    } else {
+      formik.setFieldValue("experienceDetails", []);
+    }
+  };
+
+  const handleCheckBox = (e, id) => {
+    console.log("ID", id);
+    // formik.handleChange(e)
+    const experienceArray = formik.values.experienceDetails.map((ele) => {
+      if (ele.id === id) {
+        return { ...ele, checkBox: e.target.checked, toDate: "Present" };
+        
+      } else {
+        return ele;
+      }
+    });
+    formik.setFieldValue("experienceDetails", experienceArray);
+  };
+  console.log(formik.errors)
   return (
     <>
       <Paper elevation={3} sx={{ marginTop: "50px" }}>
@@ -205,7 +246,6 @@ function EducationDetails({
           {formik.values.educationDetails.map((education, index) => (
             <Grid container spacing={2} padding={3} key={index}>
               <Grid item xs={6}>
-                  
                 <FormControl fullWidth className={classes.textField}>
                   <InputLabel id="demo-simple-select-label">
                     Education Type
@@ -246,8 +286,7 @@ function EducationDetails({
                 </FormControl>
               </Grid>
               <Grid item xs={6}>
-              <FormControl fullWidth className={classes.textField}>
-
+                <FormControl fullWidth className={classes.textField}>
                   <InputLabel id="demo-simple-select-label">
                     Institute Name
                   </InputLabel>
@@ -287,8 +326,7 @@ function EducationDetails({
                 </FormControl>
               </Grid>
               <Grid item xs={3}>
-              <FormControl fullWidth className={classes.textField}>
-
+                <FormControl fullWidth className={classes.textField}>
                   <InputLabel id="demo-simple-select-label">Course</InputLabel>
                   <Select
                     labelId="demo-simple-select-label"
@@ -357,8 +395,7 @@ function EducationDetails({
                 />
               </Grid>
               <Grid item xs={3}>
-              <FormControl fullWidth className={classes.textField}>
-
+                <FormControl fullWidth className={classes.textField}>
                   <InputLabel id="demo-simple-select-label">
                     Passing Year
                   </InputLabel>
@@ -404,7 +441,7 @@ function EducationDetails({
                     sx={{ backgroundColor: "#FF9933" }}
                     size="small"
                     type="button"
-                    onClick={() => handleRemoveFields(index)}
+                    onClick={() => handleRemoveFields(education.id)}
                   >
                     Remove
                   </Button>
@@ -412,284 +449,245 @@ function EducationDetails({
               )}
             </Grid>
           ))}
-          <Box display="flex" justifyContent="space-between">
-            <Typography variant="h4" marginLeft={"20px"}>
-              Experience Details
-            </Typography>
-            <Button
-              size="small"
-              variant="contained"
-              sx={{ margin: "10px", backgroundColor: "#FF9933" }}
-              onClick={handleAddExperience}
-            >
-              Add Experience
-            </Button>
-          </Box>
-          {formik.values.experienceDetails.map((item, index) => (
-            <Grid container spacing={2} padding={3} key={index}>
-              <Grid item xs={4}>
-              <FormControl fullWidth className={classes.textField}>
-
-                  <InputLabel id="demo-simple-select-label">
-                    Experience
-                  </InputLabel>
-                  <Select
-                    labelId="demo-simple-select-label"
-                    id="totalExperience"
-                    value={
-                      formik.values.experienceDetails[index].totalExperience
-                    }
-                    label="Experience"
-                    name={`experienceDetails[${index}].totalExperience`}
-                    onChange={formik.handleChange}
-                    onBlur={formik.handleBlur}
-                    error={
-                      formik.errors.experienceDetails &&
-                      formik.errors.experienceDetails[index] &&
-                      formik.errors.experienceDetails[index].totalExperience &&
-                      formik.touched.experienceDetails &&
-                      formik.touched.experienceDetails[index] &&
-                      formik.touched.experienceDetails[index].totalExperience
-                    }
+          <Typography variant="h4" marginLeft={"20px"}>
+            Experience Details
+          </Typography>
+          <Grid container spacing={2} padding={3}>
+            <Grid item xs={4}>
+              <TextField
+                fullWidth
+                name="totalExperience"
+                className={classes.textField}
+                placeholder=""
+                label="Total Experience"
+                type="text"
+                onBlur={formik.handleBlur}
+                onChange={(e) => handleChangeOfTotalExperience(e)}
+                value={formik.values.totalExperience}
+                error={
+                  formik.errors.totalExperience &&
+                  formik.touched.totalExperience
+                }
+                helperText={
+                  formik.errors.totalExperience &&
+                  formik.touched.totalExperience
+                    ? formik.errors.totalExperience
+                    : null
+                }
+              ></TextField>
+            </Grid>
+            {formik.values.totalExperience > 0 &&
+              formik.values.totalExperience <= 50 &&
+              formik.values.experienceDetails && (
+                <Grid item xs={2}>
+                  <Button
+                    size="small"
+                    variant="contained"
+                    sx={{ backgroundColor: "#FF9933" }}
+                    onClick={handleAddExperience}
                   >
-                    {experience.map((type, index) => (
-                      <MenuItem key={index} value={type}>
-                        {type}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                  {formik.errors.experienceDetails &&
-                    formik.errors.experienceDetails[index] &&
-                    formik.errors.experienceDetails[index].totalExperience &&
-                    formik.touched.experienceDetails &&
-                    formik.touched.experienceDetails[index] &&
-                    formik.touched.experienceDetails[index].totalExperience && (
-                      <FormHelperText style={{ color: "red" }}>
-                        {formik.errors.experienceDetails[index].totalExperience}
-                      </FormHelperText>
-                    )}
-                </FormControl>
-              </Grid>
-              <Grid item xs={4}>
-                <TextField
-                  fullWidth
-                  name={`experienceDetails[${index}].company`}
-                  className={classes.textField}
-                  placeholder=""
-                  label="Company"
-                  type="text"
-                  onBlur={formik.handleBlur}
-                  onChange={formik.handleChange}
-                  value={formik.values.experienceDetails[index].company}
-                  error={
-                    formik.errors.experienceDetails &&
-                    formik.errors.experienceDetails[index] &&
-                    formik.errors.experienceDetails[index].company &&
-                    formik.touched.experienceDetails &&
-                    formik.touched.experienceDetails[index] &&
-                    formik.touched.experienceDetails[index].company
-                  }
-                  helperText={
-                    formik.errors.experienceDetails &&
-                    formik.errors.experienceDetails[index] &&
-                    formik.errors.experienceDetails[index].company &&
-                    formik.touched.experienceDetails &&
-                    formik.touched.experienceDetails[index] &&
-                    formik.touched.experienceDetails[index].company
-                      ? formik.errors.experienceDetails[index].company
-                      : null
-                  }
-                />
-              </Grid>
-              <Grid item xs={4}>
-                <TextField
-                  fullWidth
-                  className={classes.textField}
-                  name={`experienceDetails[${index}].designation`}
-                  placeholder=""
-                  label="designation"
-                  type="text"
-                  onBlur={formik.handleBlur}
-                  onChange={formik.handleChange}
-                  value={formik.values.experienceDetails[index].designation}
-                  error={
-                    formik.errors.experienceDetails &&
-                    formik.errors.experienceDetails[index] &&
-                    formik.errors.experienceDetails[index].designation &&
-                    formik.touched.experienceDetails &&
-                    formik.touched.experienceDetails[index] &&
-                    formik.touched.experienceDetails[index].designation
-                  }
-                  helperText={
-                    formik.errors.experienceDetails &&
-                    formik.errors.experienceDetails[index] &&
-                    formik.errors.experienceDetails[index].designation &&
-                    formik.touched.experienceDetails &&
-                    formik.touched.experienceDetails[index] &&
-                    formik.touched.experienceDetails[index].designation
-                      ? formik.errors.experienceDetails[index].designation
-                      : null
-                  }
-                />
-              </Grid>
-              <Grid item xs={6}>
-              <FormControl fullWidth className={classes.textField}>
+                    Add Experience
+                  </Button>
+                </Grid>
+              )}
+          </Grid>
 
-                  <InputLabel id="demo-simple-select-label">
-                    Technology
-                  </InputLabel>
-                  <Select
-                    labelId="demo-simple-select-label"
-                    id="technology"
-                    value={formik.values.experienceDetails[index].technology}
-                    label="Technology"
-                    name={`experienceDetails[${index}].technology`}
-                    onChange={formik.handleChange}
-                    onBlur={formik.handleBlur}
-                    error={
-                      formik.errors.experienceDetails &&
-                      formik.errors.experienceDetails[index] &&
-                      formik.errors.experienceDetails[index].technology &&
-                      formik.touched.experienceDetails &&
-                      formik.touched.experienceDetails[index] &&
-                      formik.touched.experienceDetails[index].technology
-                    }
-                  >
-                    {technologies.map((type, index) => (
-                      <MenuItem key={index} value={type}>
-                        {type}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                  {formik.errors.experienceDetails &&
-                    formik.errors.experienceDetails[index] &&
-                    formik.errors.experienceDetails[index].technology &&
-                    formik.touched.experienceDetails &&
-                    formik.touched.experienceDetails[index] &&
-                    formik.touched.experienceDetails[index].technology && (
-                      <FormHelperText style={{ color: "red" }}>
-                        {formik.errors.experienceDetails[index].technology}
-                      </FormHelperText>
-                    )}
-                </FormControl>
-              </Grid>
-
-              <Grid item xs={6}>
-                <TextField
-                  fullWidth
-                  name={`experienceDetails[${index}].reasonForJobChange`}
-                  placeholder=""
-                  label="Reason for job change"
-                  className={classes.textField}
-                  type="text"
-                  onBlur={formik.handleBlur}
-                  onChange={formik.handleChange}
-                  value={
-                    formik.values.experienceDetails[index].reasonForJobChange
-                  }
-                  error={
-                    formik.errors.experienceDetails &&
-                    formik.errors.experienceDetails[index] &&
-                    formik.errors.experienceDetails[index].reasonForJobChange &&
-                    formik.touched.experienceDetails &&
-                    formik.touched.experienceDetails[index] &&
-                    formik.touched.experienceDetails[index].reasonForJobChange
-                  }
-                  helperText={
-                    formik.errors.experienceDetails &&
-                    formik.errors.experienceDetails[index] &&
-                    formik.errors.experienceDetails[index].reasonForJobChange &&
-                    formik.touched.experienceDetails &&
-                    formik.touched.experienceDetails[index] &&
-                    formik.touched.experienceDetails[index].reasonForJobChange
-                      ? formik.errors.experienceDetails[index]
-                          .reasonForJobChange
-                      : null
-                  }
-                />
-              </Grid>
-              <Grid item xs={3}>
-                <FormGroup>
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        sx={{
-                          color: "#FF9933",
-                          "&.Mui-checked": {
-                            color: "#FF9933",
-                          },
-                        }}
-                        name={`experienceDetails[${index}].checkBox`}
-                        onChange={formik.handleChange}
-                        value={formik.values.experienceDetails[index].checkBox}
-                      />
-                    }
-                    label="Mark if the company is present"
-                  />
-                </FormGroup>
-              </Grid>
-              <Grid item xs={3}>
-                <TextField
-                  fullWidth
-                  name={`experienceDetails[${index}].fromDate`}
-                  placeholder=""
-                  label="From date"
-                  className={classes.textField}
-                  type="date"
-                  onBlur={formik.handleBlur}
-                  onChange={formik.handleChange}
-                  value={formik.values.experienceDetails[index].fromDate}
-                  error={
-                    formik.errors.experienceDetails &&
-                    formik.errors.experienceDetails[index] &&
-                    formik.errors.experienceDetails[index].fromDate &&
-                    formik.touched.experienceDetails &&
-                    formik.touched.experienceDetails[index] &&
-                    formik.touched.experienceDetails[index].fromDate
-                  }
-                  helperText={
-                    formik.errors.experienceDetails &&
-                    formik.errors.experienceDetails[index] &&
-                    formik.errors.experienceDetails[index].fromDate &&
-                    formik.touched.experienceDetails &&
-                    formik.touched.experienceDetails[index] &&
-                    formik.touched.experienceDetails[index].fromDate
-                      ? formik.errors.experienceDetails[index].fromDate
-                      : null
-                  }
-                  InputLabelProps={{
-                    shrink: true,
-                  }}
-                />
-              </Grid>
-              {formik.values.experienceDetails[index].checkBox === false ? (
-                <Grid item xs={3}>
+          {formik.values.totalExperience > 0 &&
+            formik.values.totalExperience <= 50 &&
+            formik.values.experienceDetails &&
+            formik.values.experienceDetails.map((item, index) => (
+              <Grid container spacing={2} padding={3} key={index}>
+                <Grid item xs={6}>
                   <TextField
                     fullWidth
-                    name={`experienceDetails[${index}].toDate`}
-                    placeholder=""
-                    label="To date"
+                    name={`experienceDetails[${index}].company`}
                     className={classes.textField}
-                    type="date"
+                    placeholder=""
+                    label="Company"
+                    type="text"
                     onBlur={formik.handleBlur}
                     onChange={formik.handleChange}
-                    value={formik.values.experienceDetails[index].toDate}
+                    value={formik.values.experienceDetails[index].company}
                     error={
                       formik.errors.experienceDetails &&
                       formik.errors.experienceDetails[index] &&
-                      formik.errors.experienceDetails[index].toDate &&
+                      formik.errors.experienceDetails[index].company &&
                       formik.touched.experienceDetails &&
                       formik.touched.experienceDetails[index] &&
-                      formik.touched.experienceDetails[index].toDate
+                      formik.touched.experienceDetails[index].company
                     }
                     helperText={
                       formik.errors.experienceDetails &&
                       formik.errors.experienceDetails[index] &&
-                      formik.errors.experienceDetails[index].toDate &&
+                      formik.errors.experienceDetails[index].company &&
                       formik.touched.experienceDetails &&
                       formik.touched.experienceDetails[index] &&
-                      formik.touched.experienceDetails[index].toDate
-                        ? formik.errors.experienceDetails[index].toDate
+                      formik.touched.experienceDetails[index].company
+                        ? formik.errors.experienceDetails[index].company
+                        : null
+                    }
+                  />
+                </Grid>
+                <Grid item xs={6}>
+                  <TextField
+                    fullWidth
+                    className={classes.textField}
+                    name={`experienceDetails[${index}].designation`}
+                    placeholder=""
+                    label="designation"
+                    type="text"
+                    onBlur={formik.handleBlur}
+                    onChange={formik.handleChange}
+                    value={formik.values.experienceDetails[index].designation}
+                    error={
+                      formik.errors.experienceDetails &&
+                      formik.errors.experienceDetails[index] &&
+                      formik.errors.experienceDetails[index].designation &&
+                      formik.touched.experienceDetails &&
+                      formik.touched.experienceDetails[index] &&
+                      formik.touched.experienceDetails[index].designation
+                    }
+                    helperText={
+                      formik.errors.experienceDetails &&
+                      formik.errors.experienceDetails[index] &&
+                      formik.errors.experienceDetails[index].designation &&
+                      formik.touched.experienceDetails &&
+                      formik.touched.experienceDetails[index] &&
+                      formik.touched.experienceDetails[index].designation
+                        ? formik.errors.experienceDetails[index].designation
+                        : null
+                    }
+                  />
+                </Grid>
+                <Grid item xs={6}>
+                  <FormControl fullWidth className={classes.textField}>
+                    <InputLabel id="demo-simple-select-label">
+                      Technology
+                    </InputLabel>
+                    <Select
+                      labelId="demo-simple-select-label"
+                      id="technology"
+                      value={formik.values.experienceDetails[index].technology}
+                      label="Technology"
+                      name={`experienceDetails[${index}].technology`}
+                      onChange={formik.handleChange}
+                      onBlur={formik.handleBlur}
+                      error={
+                        formik.errors.experienceDetails &&
+                        formik.errors.experienceDetails[index] &&
+                        formik.errors.experienceDetails[index].technology &&
+                        formik.touched.experienceDetails &&
+                        formik.touched.experienceDetails[index] &&
+                        formik.touched.experienceDetails[index].technology
+                      }
+                    >
+                      {technologies.map((type, index) => (
+                        <MenuItem key={index} value={type}>
+                          {type}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                    {formik.errors.experienceDetails &&
+                      formik.errors.experienceDetails[index] &&
+                      formik.errors.experienceDetails[index].technology &&
+                      formik.touched.experienceDetails &&
+                      formik.touched.experienceDetails[index] &&
+                      formik.touched.experienceDetails[index].technology && (
+                        <FormHelperText style={{ color: "red" }}>
+                          {formik.errors.experienceDetails[index].technology}
+                        </FormHelperText>
+                      )}
+                  </FormControl>
+                </Grid>
+
+                <Grid item xs={6}>
+                  <TextField
+                    fullWidth
+                    name={`experienceDetails[${index}].reasonForJobChange`}
+                    placeholder=""
+                    label="Reason for job change"
+                    className={classes.textField}
+                    type="text"
+                    onBlur={formik.handleBlur}
+                    onChange={formik.handleChange}
+                    value={
+                      formik.values.experienceDetails[index].reasonForJobChange
+                    }
+                    error={
+                      formik.errors.experienceDetails &&
+                      formik.errors.experienceDetails[index] &&
+                      formik.errors.experienceDetails[index]
+                        .reasonForJobChange &&
+                      formik.touched.experienceDetails &&
+                      formik.touched.experienceDetails[index] &&
+                      formik.touched.experienceDetails[index].reasonForJobChange
+                    }
+                    helperText={
+                      formik.errors.experienceDetails &&
+                      formik.errors.experienceDetails[index] &&
+                      formik.errors.experienceDetails[index]
+                        .reasonForJobChange &&
+                      formik.touched.experienceDetails &&
+                      formik.touched.experienceDetails[index] &&
+                      formik.touched.experienceDetails[index].reasonForJobChange
+                        ? formik.errors.experienceDetails[index]
+                            .reasonForJobChange
+                        : null
+                    }
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <FormGroup>
+                    <FormControlLabel
+                      control={
+                        <Checkbox
+                          sx={{
+                            color: "#FF9933",
+                            "&.Mui-checked": {
+                              color: "#FF9933",
+                            },
+                          }}
+                          name={`experienceDetails[${index}].checkBox`}
+                          onChange={(e) => handleCheckBox(e, item.id)}
+                          value={
+                            formik.values.experienceDetails[index].checkBox
+                          }
+                          checked={
+                            formik.values.experienceDetails[index].checkBox
+                          }
+                        />
+                      }
+                      label="Mark if the company is present"
+                    />
+                  </FormGroup>
+                </Grid>
+                <Grid item xs={6}>
+                  <TextField
+                    fullWidth
+                    name={`experienceDetails[${index}].fromDate`}
+                    placeholder=""
+                    label="From date"
+                    className={classes.textField}
+                    type="date"
+                    onBlur={formik.handleBlur}
+                    onChange={formik.handleChange}
+                    value={formik.values.experienceDetails[index].fromDate}
+                    error={
+                      formik.errors.experienceDetails &&
+                      formik.errors.experienceDetails[index] &&
+                      formik.errors.experienceDetails[index].fromDate &&
+                      formik.touched.experienceDetails &&
+                      formik.touched.experienceDetails[index] &&
+                      formik.touched.experienceDetails[index].fromDate
+                    }
+                    helperText={
+                      formik.errors.experienceDetails &&
+                      formik.errors.experienceDetails[index] &&
+                      formik.errors.experienceDetails[index].fromDate &&
+                      formik.touched.experienceDetails &&
+                      formik.touched.experienceDetails[index] &&
+                      formik.touched.experienceDetails[index].fromDate
+                        ? formik.errors.experienceDetails[index].fromDate
                         : null
                     }
                     InputLabelProps={{
@@ -697,22 +695,57 @@ function EducationDetails({
                     }}
                   />
                 </Grid>
-              ) : null}
-              {index > 0 && (
-                <Grid item xs={1}>
-                  <Button
-                    variant="contained"
-                    sx={{ backgroundColor: "#FF9933" }}
-                    size="small"
-                    type="button"
-                    onClick={() => handleRemoveExperience(index)}
-                  >
-                    Remove
-                  </Button>
-                </Grid>
-              )}
-            </Grid>
-          ))}
+                {formik.values.experienceDetails[index].checkBox === false ? (
+                  <Grid item xs={6}>
+                    <TextField
+                      fullWidth
+                      name={`experienceDetails[${index}].toDate`}
+                      placeholder=""
+                      label="To date"
+                      className={classes.textField}
+                      type="date"
+                      onBlur={formik.handleBlur}
+                      onChange={formik.handleChange}
+                      value={formik.values.experienceDetails[index].toDate}
+                      error={
+                        formik.errors.experienceDetails &&
+                        formik.errors.experienceDetails[index] &&
+                        formik.errors.experienceDetails[index].toDate &&
+                        formik.touched.experienceDetails &&
+                        formik.touched.experienceDetails[index] &&
+                        formik.touched.experienceDetails[index].toDate
+                      }
+                      helperText={
+                        formik.errors.experienceDetails &&
+                        formik.errors.experienceDetails[index] &&
+                        formik.errors.experienceDetails[index].toDate &&
+                        formik.touched.experienceDetails &&
+                        formik.touched.experienceDetails[index] &&
+                        formik.touched.experienceDetails[index].toDate
+                          ? formik.errors.experienceDetails[index].toDate
+                          : null
+                      }
+                      InputLabelProps={{
+                        shrink: true,
+                      }}
+                    />
+                  </Grid>
+                ) : null}
+                {index > 0 && (
+                  <Grid item xs={1}>
+                    <Button
+                      variant="contained"
+                      sx={{ backgroundColor: "#FF9933" }}
+                      size="small"
+                      type="button"
+                      onClick={() => handleRemoveExperience(item.id)}
+                    >
+                      Remove
+                    </Button>
+                  </Grid>
+                )}
+              </Grid>
+            ))}
           <Box
             sx={{
               display: "flex",
@@ -725,7 +758,7 @@ function EducationDetails({
             <Button
               color="inherit"
               disabled={activeStep === 0}
-              onClick={handleBack}
+              onClick={handleBackButton}
               sx={{ mr: 1, marginBottom: "20px" }}
             >
               Back
@@ -740,44 +773,13 @@ function EducationDetails({
                   backgroundColor: "#FF9933", // Set the desired color on hover
                 },
               }}
-              disabled={!(formik.isValid && formik.dirty)}
+              disabled={!(formik.isValid)}
             >
               {activeStep === steps.length - 1 ? "Finish" : "Next"}
             </Button>
           </Box>
         </form>
       </Paper>
-      {/* <Box
-        sx={{
-          display: "flex",
-          flexDirection: "row",
-          pt: 2,
-          justifyContent: "space-between",
-          margin: "20px",
-        }}
-      >
-        <Button
-          color="inherit"
-          disabled={activeStep === 0}
-          onClick={handleBack}
-          sx={{ mr: 1, marginBottom: "20px" }}
-        >
-          Back
-        </Button>
-        <Button
-          onClick={handleNext}
-          sx={{
-            backgroundColor: "#ffaa54",
-            color: "white",
-            marginBottom: "20px",
-            "&:hover": {
-              backgroundColor: "#FF9933", // Set the desired color on hover
-            },
-          }}
-        >
-          {activeStep === steps.length - 1 ? "Finish" : "Next"}
-        </Button>
-      </Box> */}
     </>
   );
 }

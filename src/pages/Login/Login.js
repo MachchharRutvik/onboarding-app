@@ -15,8 +15,7 @@ function Login() {
   const Navigate = useNavigate();
   const handleSubmit = () => {
     console.log(formik.isValid)
-    if(formik.isValid){
-      
+    if(formik.isValid && formik.values.password==="123"){
       Navigate("/form");
     }
   }

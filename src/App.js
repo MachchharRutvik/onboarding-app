@@ -5,6 +5,7 @@ import { ThemeProvider } from "@emotion/react";
 import GlobalStyles from "./GlobalStyles";
 import { Router, Route,Routes } from "react-router-dom";
 import Stepper from "./pages/onBoardingForm/Stepper";
+import Success from "./pages/onBoardingForm/onBoardingFormComponents/Success";
 
 const theme = {};
 
@@ -15,6 +16,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/form" element={<Stepper />} />
+        <Route path="/success" element={<Success />}/>
       </Routes>
     </ThemeProvider>
   );
