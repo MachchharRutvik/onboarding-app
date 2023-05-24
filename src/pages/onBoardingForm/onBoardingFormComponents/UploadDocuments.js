@@ -15,13 +15,12 @@ import { Typography } from "@mui/material";
 import { useFormik } from "formik";
 import { FormControl } from "@mui/material";
 import { InputLabel } from "@mui/material";
-
 import { makeStyles } from "@mui/styles";
-import { useState } from "react";
 import { Chip } from "@mui/material";
 import { styled } from "@mui/material";
 import { UploadDocumentsSchema } from "../../../validation/UploadDocumentsSchema";
 
+// styles for textField
 const useStyles = makeStyles((theme) => ({
   textField: {
     "& .MuiInputBase-input": {
@@ -41,6 +40,8 @@ const useStyles = makeStyles((theme) => ({
     width: "100%",
   },
 }));
+
+// styles for item
 const Item = styled(Box)(({ theme }) => ({
   backgroundColor: theme.palette.mode === "dark" ? "#1A2027" : "#fff",
   ...theme.typography.body2,
@@ -57,105 +58,31 @@ function UploadDocuments({
   documentsData,
 }) {
   const classes = useStyles();
+
+  // Setting all the data back to form
   useEffect(() => {
-    setAllTheData();
-  }, []);
+    setAllTheData(); // call for set data
+  }, [documentsData]);
 
+  // File references for Input file
+  const fileRefForEducationCertificates = {}
   const fileRef = {
-   adharFront: useRef(null),
-   adharBack: useRef(null),
-   panCardDocument: useRef(null),
-   latestExperienceLetter: useRef(null),
-   latestRelievingLetter: useRef(null),
-   salarySlips: useRef(null),
-   form16: useRef(null),
-  }
+    adharFront: useRef(null),
+    adharBack: useRef(null),
+    panCardDocument: useRef(null),
+    latestExperienceLetter: useRef(null),
+    latestRelievingLetter: useRef(null),
+    salarySlips: useRef(null),
+    form16: useRef(null),
+  };
 
+  // all the select menu arrays
   const educationCertificates = [
     "10th",
     "12th",
     "Bachelor's degree",
     "Master's degree",
   ];
-
-  const initialValues = {
-    educationCertificate: [
-      {
-        id: uuid(),
-        documentName: "",
-        document: null,
-      },
-    ],
-    adharNumber: "",
-    adharFront: "",
-    adharBack: "",
-    panCardNumber: "",
-    panCardDocument: "",
-    streetLine1: "",
-    streetLine2: "",
-    state: "",
-    country: "",
-    area: "",
-    city: "",
-    postalCode: "",
-    perStreetLine1: "",
-    perStreetLine2: "",
-    perState: "",
-    perCountry: "",
-    perArea: "",
-    perCity: "",
-    perPostalCode: "",
-    addressSame: true,
-    latestExperienceLetter: "",
-    latestRelievingLetter: "",
-    salarySlips: "",
-    form16: "",
-  };
-
-  const handleAddEducationCertificate = () => {
-    console.log("handleAddEducationDerio");
-
-    formik.setValues({
-      ...formik.values,
-      educationCertificate: [
-        ...formik.values.educationCertificate,
-        {
-          id: uuid(),
-          document: "",
-          documentName: "",
-        },
-      ],
-    });
-  };
-  const handleRemoveEducationCertificate = (index) => {
-    const educationCertificate = [...formik.values.educationCertificate];
-    educationCertificate.splice(index, 1);
-    formik.setValues({
-      ...formik.values,
-      educationCertificate,
-    });
-  };
-
-  const handleDelete = (fieldName) => {
-    formik.setFieldValue(fieldName, "");
-  };
-
-  const handleEducationDocumentName = (event, userId) => {
-    // console.log("EUC_ID", userId);
-    // console.log(event.target.value);
-    formik.handleChange(event);
-    const updatedCertificate = formik.values.educationCertificate.map((ele) => {
-      if (ele.id === userId) {
-        return { ...ele, documentName: event.target.value };
-      } else {
-        return ele;
-      }
-    });
-    formik.setValues({
-      ...formik.values,
-      educationCertificate: updatedCertificate,
-    });
-  };
 
   const countryAddress = {
     country: {
@@ -320,6 +247,85 @@ function UploadDocuments({
     },
   };
 
+  // initial values for form
+  const initialValues = {
+    educationCertificates: [
+      {
+        id: uuid(),
+        documentName: "",
+        document: null,
+      },
+    ],
+    adharNumber: "",
+    adharFront: "",
+    adharBack: "",
+    panCardNumber: "",
+    panCardDocument: "",
+    streetLine1: "",
+    streetLine2: "",
+    state: "",
+    country: "",
+    area: "",
+    city: "",
+    postalCode: "",
+    perStreetLine1: "",
+    perStreetLine2: "",
+    perState: "",
+    perCountry: "",
+    perArea: "",
+    perCity: "",
+    perPostalCode: "",
+    addressSame: true,
+    latestExperienceLetter: "",
+    latestRelievingLetter: "",
+    salarySlips: "",
+    form16: "",
+  };
+
+  // submit form
+  const onSubmit = (values) => {
+    console.log(formik.values);
+    setDocumentsData(values);
+    handleNext();
+  };
+
+  // handle single image uploads of all the fields
+  const handleImage = (fieldName, event) => {
+    const files = event.target.files[0];
+    formik.setFieldValue(fieldName, files);
+  };
+
+  // adding select and upload for education certificate fields dynamically
+  const handleAddEducationCertificate = () => {
+    formik.setValues({
+      ...formik.values,
+      educationCertificates: [
+        ...formik.values.educationCertificates,
+        {
+          id: uuid(),
+          document: "",
+          documentName: "",
+        },
+      ],
+    });
+  };
+
+  // removing education certificate on click of remove button
+  const handleRemoveEducationCertificate = (index) => {
+    const educationCertificates = [...formik.values.educationCertificates];
+    educationCertificates.splice(index, 1);
+    formik.setValues({
+      ...formik.values,
+      educationCertificates,
+    });
+  };
+
+  // remove image by clicking on cross in chips for all the documents except educational certificates
+  const handleDelete = (fieldName) => {
+    formik.setFieldValue(fieldName, "");
+  };
+
+  // setting permanent address on click of checkbox
   const handleChangeCheckbox = (event) => {
     formik.setFieldValue("addressSame", event.target.checked);
     if (event.target.checked) {
@@ -340,6 +346,8 @@ function UploadDocuments({
       formik.setFieldValue("perPostalCode", "");
     }
   };
+
+  // binding present address fields with permanent address
   const handleChangeAddress = (e) => {
     formik.handleChange(e);
     if (formik.values.addressSame) {
@@ -349,11 +357,45 @@ function UploadDocuments({
       formik.setFieldValue("per" + name, e.target.value);
     }
   };
+
+  // setting document name by selecting from select menu
+  const handleEducationDocumentName = (event, userId) => {
+    formik.handleChange(event);
+    const updatedCertificate = formik.values.educationCertificates.map(
+      (ele) => {
+        if (ele.id === userId) {
+          return { ...ele, documentName: event.target.value };
+        } else {
+          return ele;
+        }
+      }
+    );
+    formik.setValues({
+      ...formik.values,
+      educationCertificates: updatedCertificate,
+    });
+  };
+  // function for uploading education documents
   const handleEducationDocuments = (event, userId) => {
+    console.log("handle education documnets");
+    formik.values.educationCertificates.map((ele, index) => {
+      if (ele.id === userId) {
+        if (!ele.documentName) {
+          const educationCertificate =
+            formik.touched.educationCertificates[index];
+          educationCertificate.documentName = true;
+          formik.setTouched({
+            ...formik.touched,
+            educationCertifices: educationCertificate,
+          });
+          console.log(formik.touched);
+        }
+      }
+    });
     const files = event.target.files;
     if (files.length > 0) {
       const file = files[0];
-      let educationArray = formik.values.educationCertificate.map(
+      let educationArray = formik.values.educationCertificates.map(
         (ele, index) => {
           if (ele.id === userId) {
             return { ...ele, document: file };
@@ -364,12 +406,14 @@ function UploadDocuments({
       );
       formik.setValues({
         ...formik.values,
-        educationCertificate: educationArray,
+        educationCertificates: educationArray,
       });
     }
   };
+
+  // function for deleting education documents from chips
   const handleEducationDocumentDelete = (id) => {
-    let educationArray = formik.values.educationCertificate.map((ele) => {
+    let educationArray = formik.values.educationCertificates.map((ele) => {
       if (ele.id === id) {
         return { ...ele, document: "" };
       } else {
@@ -378,16 +422,13 @@ function UploadDocuments({
     });
     formik.setValues({
       ...formik.values,
-      educationCertificate: educationArray,
+      educationCertificates: educationArray,
     });
   };
-  const onSubmit = (values) => {
-    console.log(formik.values);
-    setDocumentsData(values);
-    handleNext();
-  };
+
+  // handle back button
   const handleBackButton = () => {
-    setDocumentsData(formik.values);
+    setDocumentsData(formik.values); // setting all the data when going back
     handleBack();
   };
   const formik = useFormik({
@@ -396,10 +437,11 @@ function UploadDocuments({
     validationSchema: UploadDocumentsSchema,
   });
 
+  // function for setting all the data back to form
   const setAllTheData = () => {
     if (documentsData !== null) {
       formik.setFieldValue("adharNumber", documentsData.adharNumber);
-      formik.setFieldValue("panNumber", documentsData.panNumber);
+      formik.setFieldValue("panCardNumber", documentsData.panCardNumber);
       formik.setFieldValue("adharFront", documentsData.adharFront);
       formik.setFieldValue("adharBack", documentsData.adharBack);
       formik.setFieldValue("panCardDocument", documentsData.panCardDocument);
@@ -429,16 +471,13 @@ function UploadDocuments({
       formik.setFieldValue("salarySlips", documentsData.salarySlips);
       formik.setFieldValue("form16", documentsData.form16);
       formik.setFieldValue(
-        "educationCertificate",
-        documentsData.educationCertificate
+        "educationCertificates",
+        documentsData.educationCertificates
       );
     }
   };
-  const handleImage = (fieldName, event) => {
-    const files = event.target.files[0];
-    formik.setFieldValue(fieldName, files);
-  };
-  console.log("Values",formik.values)
+  // console.log(formik.errors);
+  // console.log("File ref",fileRefForEducationCertificates)
 
   return (
     <>
@@ -1114,8 +1153,8 @@ function UploadDocuments({
             </Button>
           </Box>
           <Grid container spacing={2} padding={3}>
-            {formik.values.educationCertificate &&
-              formik.values.educationCertificate.map((certificate, index) => (
+            {formik.values.educationCertificates &&
+              formik.values.educationCertificates.map((certificate, index) => (
                 <>
                   <Grid item xs={4} key={index}>
                     <FormControl fullWidth className={classes.textField}>
@@ -1126,22 +1165,23 @@ function UploadDocuments({
                         labelId="demo-simple-select-label"
                         id="documentName"
                         value={
-                          formik.values.educationCertificate[index].documentName
+                          formik.values.educationCertificates[index]
+                            .documentName
                         }
                         label="Education Certificates"
-                        name={`educationCertificate[${index}].documentName`}
+                        name={`educationCertificates[${index}].documentName`}
                         onChange={(e) =>
                           handleEducationDocumentName(e, certificate.id)
                         }
                         onBlur={formik.handleBlur}
                         error={
-                          formik.errors.educationCertificate &&
-                          formik.errors.educationCertificate[index] &&
-                          formik.errors.educationCertificate[index]
+                          formik.errors.educationCertificates &&
+                          formik.errors.educationCertificates[index] &&
+                          formik.errors.educationCertificates[index]
                             .documentName &&
-                          formik.touched.educationCertificate &&
-                          formik.touched.educationCertificate[index] &&
-                          formik.touched.educationCertificate[index]
+                          formik.touched.educationCertificates &&
+                          formik.touched.educationCertificates[index] &&
+                          formik.touched.educationCertificates[index]
                             .documentName
                         }
                       >
@@ -1151,17 +1191,17 @@ function UploadDocuments({
                           </MenuItem>
                         ))}
                       </Select>
-                      {formik.errors.educationCertificate &&
-                        formik.errors.educationCertificate[index] &&
-                        formik.errors.educationCertificate[index]
+                      {formik.errors.educationCertificates &&
+                        formik.errors.educationCertificates[index] &&
+                        formik.errors.educationCertificates[index]
                           .documentName &&
-                        formik.touched.educationCertificate &&
-                        formik.touched.educationCertificate[index] &&
-                        formik.touched.educationCertificate[index]
+                        formik.touched.educationCertificates &&
+                        formik.touched.educationCertificates[index] &&
+                        formik.touched.educationCertificates[index]
                           .documentName && (
                           <FormHelperText style={{ color: "red" }}>
                             {
-                              formik.errors.educationCertificate[index]
+                              formik.errors.educationCertificates[index]
                                 .documentName
                             }
                           </FormHelperText>
@@ -1171,38 +1211,43 @@ function UploadDocuments({
                   <Grid item xs={1}>
                     <div>
                       {/* <label htmlFor="adharDocument">Adhaar Document</label> */}
-                      <input
-                        ref={fileRef}
-                        type="file"
-                        onChange={(e) =>
-                          handleEducationDocuments(e, certificate.id)
-                        }
-                        hidden
-                        disabled={!certificate.documentName}
-                      />
+                      <div>
+                        <input
+                          ref={(el) => (fileRefForEducationCertificates[certificate.id] = el)}
+                          type="file"
+                          onChange={(e) =>
+                            handleEducationDocuments(e, certificate.id)
+                          }
+                          hidden
+                        />
+                        <Button
+                          id="document"
+                          name={`educationCertificates[${index}].document`}
+                          onBlur={formik.handleBlur}
+                          component="span"
+                          size="small"
+                          variant="contained"
+                          sx={{ backgroundColor: "#FF9933" }}
+                          onClick={() => {
+                            fileRefForEducationCertificates[certificate.id].click();
+                          }}
+                        >
+                          Upload
+                        </Button>
+                      </div>
 
-                      <Button
-                        id="document"
-                        name={`educationCertificate[${index}].document`}
-                        onBlur={formik.handleBlur}
-                        component="span"
-                        size="small"
-                        variant="contained"
-                        sx={{ backgroundColor: "#FF9933" }}
-                        onClick={() => {
-                          fileRef.current.click();
-                        }}
-                      >
-                        Upload
-                      </Button>
-                      {formik.errors.educationCertificate &&
-                        formik.errors.educationCertificate[index] &&
-                        formik.errors.educationCertificate[index].document &&
-                        formik.touched.educationCertificate &&
-                        formik.touched.educationCertificate[index] &&
-                        formik.touched.educationCertificate[index].document && (
+                      {formik.errors.educationCertificates &&
+                        formik.errors.educationCertificates[index] &&
+                        formik.errors.educationCertificates[index].document &&
+                        formik.touched.educationCertificates &&
+                        formik.touched.educationCertificates[index] &&
+                        formik.touched.educationCertificates[index]
+                          .document && (
                           <FormHelperText style={{ color: "red" }}>
-                            {formik.errors.educationCertificate[index].document}
+                            {
+                              formik.errors.educationCertificates[index]
+                                .document
+                            }
                           </FormHelperText>
                         )}
                     </div>
@@ -1284,28 +1329,27 @@ function UploadDocuments({
             <Grid item xs={6}>
               <div>
                 {/* <label htmlFor="adharDocument">Adhaar Document</label> */}
-              
-                  <Button
-                    component="span"
-                    size="small"
-                    variant="contained"
-                    sx={{ margin: "10px", backgroundColor: "#FF9933" }}
-                    id="latestRelievingLetter"
-                    name="latestRelievingLetter"
-                    onBlur={formik.handleBlur}
-                    onClick={() => fileRef.latestRelievingLetter.current.click()}
-                  >
-                    Upload Latest Relieving Letter
-                  </Button>
-                  <input
+
+                <Button
+                  component="span"
+                  size="small"
+                  variant="contained"
+                  sx={{ margin: "10px", backgroundColor: "#FF9933" }}
+                  id="latestRelievingLetter"
+                  name="latestRelievingLetter"
+                  onBlur={formik.handleBlur}
+                  onClick={() => fileRef.latestRelievingLetter.current.click()}
+                >
+                  Upload Latest Relieving Letter
+                </Button>
+                <input
                   hidden
-                    type="file"
-                   ref={fileRef.latestRelievingLetter}
-                    onChange={(e) => handleImage("latestRelievingLetter", e)}
-               
-                  />
-               
-               {formik.errors.latestRelievingLetter &&
+                  type="file"
+                  ref={fileRef.latestRelievingLetter}
+                  onChange={(e) => handleImage("latestRelievingLetter", e)}
+                />
+
+                {formik.errors.latestRelievingLetter &&
                   formik.touched.latestRelievingLetter && (
                     <FormHelperText style={{ color: "red" }}>
                       {formik.errors.latestRelievingLetter}
@@ -1328,34 +1372,30 @@ function UploadDocuments({
             </Grid>
             <Grid item xs={6}>
               <div>
-              
-                  <Button
-                    component="span"
-                    size="small"
-                    variant="contained"
-                    sx={{ margin: "10px", backgroundColor: "#FF9933" }}
-                    id="salarySlips"
-                    name="salarySlips"
-                    onClick={()=>fileRef.salarySlips.current.click()}
-                    onBlur={formik.handleBlur}
-                  >
-                    Upload Salary slip
-                  </Button>
-                  <input
-                    
-                    type="file"
-                    ref={fileRef.salarySlips}
-                    hidden
-                    onChange={(e) => handleImage("salarySlips", e)}
-                  
-                  />
-             
-             {formik.errors.salarySlips &&
-                  formik.touched.salarySlips && (
-                    <FormHelperText style={{ color: "red" }}>
-                      {formik.errors.salarySlips}
-                    </FormHelperText>
-                  )}
+                <Button
+                  component="span"
+                  size="small"
+                  variant="contained"
+                  sx={{ margin: "10px", backgroundColor: "#FF9933" }}
+                  id="salarySlips"
+                  name="salarySlips"
+                  onClick={() => fileRef.salarySlips.current.click()}
+                  onBlur={formik.handleBlur}
+                >
+                  Upload Salary slip
+                </Button>
+                <input
+                  type="file"
+                  ref={fileRef.salarySlips}
+                  hidden
+                  onChange={(e) => handleImage("salarySlips", e)}
+                />
+
+                {formik.errors.salarySlips && formik.touched.salarySlips && (
+                  <FormHelperText style={{ color: "red" }}>
+                    {formik.errors.salarySlips}
+                  </FormHelperText>
+                )}
               </div>
             </Grid>
             <Grid item xs={6}>
@@ -1373,34 +1413,30 @@ function UploadDocuments({
             </Grid>
             <Grid item xs={6}>
               <div>
-             
-                  <Button
-                    component="span"
-                    size="small"
-                    variant="contained"
-                    sx={{ margin: "10px", backgroundColor: "#FF9933" }}
-                    id="form16"
-                    name="form16"
-                    onClick={()=>fileRef.form16.current.click()}
-                    onBlur={formik.handleBlur}
-                  >
-                    Upload Form 16
-                  </Button>
-                  <input
-                    
-                    type="file"
+                <Button
+                  component="span"
+                  size="small"
+                  variant="contained"
+                  sx={{ margin: "10px", backgroundColor: "#FF9933" }}
+                  id="form16"
+                  name="form16"
+                  onClick={() => fileRef.form16.current.click()}
+                  onBlur={formik.handleBlur}
+                >
+                  Upload Form 16
+                </Button>
+                <input
+                  type="file"
                   hidden
                   ref={fileRef.form16}
-                    onChange={(e) => handleImage("form16", e)}
-                 
-                  />
-            
-            {formik.errors.form16 &&
-                  formik.touched.form16 && (
-                    <FormHelperText style={{ color: "red" }}>
-                      {formik.errors.form16}
-                    </FormHelperText>
-                  )}
+                  onChange={(e) => handleImage("form16", e)}
+                />
+
+                {formik.errors.form16 && formik.touched.form16 && (
+                  <FormHelperText style={{ color: "red" }}>
+                    {formik.errors.form16}
+                  </FormHelperText>
+                )}
               </div>
             </Grid>
             <Grid item xs={6}>
@@ -1453,7 +1489,6 @@ function UploadDocuments({
       </Paper>
     </>
   );
-
 }
 
 export default UploadDocuments;

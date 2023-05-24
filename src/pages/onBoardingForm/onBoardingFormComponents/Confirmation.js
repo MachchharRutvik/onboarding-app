@@ -11,14 +11,18 @@ import { ConfirmationSchema } from "../../../validation/ConfirmationSchema";
 function Confirmation({ handleNext, handleBack, steps, activeStep,personalDetailsData,educationDetailsData,documentsData,setActiveStep }) 
 {
   const navigate = useNavigate()
+
+  // edit data by going to that step
   const handleEdit = (step) =>{
     console.log(step)
     setActiveStep(step)
   }
+
+  // finish button
   const handleFinish = () =>{
-    
-    navigate("/success")
+    navigate("/success") // navigate to success page
   }
+
   const formik = useFormik({
     initialValues:{
       checkbox:false
@@ -28,6 +32,8 @@ function Confirmation({ handleNext, handleBack, steps, activeStep,personalDetail
     },
     validationSchema:ConfirmationSchema
   })
+
+  // accept terms & conditions
   const handleCheckbox = () =>{
     formik.setFieldValue("checkbox",!formik.values.checkbox)
   }

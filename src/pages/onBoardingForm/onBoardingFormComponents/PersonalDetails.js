@@ -4,8 +4,6 @@ import { useState } from "react";
 import { IconButton } from "@mui/material";
 import PhotoCameraIcon from "@mui/icons-material/PhotoCamera";
 import { useFormik } from "formik";
-import * as Yup from "yup";
-import clsx from "clsx";
 import {
   TextField,
   FormControl,
@@ -18,10 +16,10 @@ import { Box } from "@mui/material";
 import { Button } from "@mui/material";
 import { PersonalDetailsSchema } from "../../../validation/PersonalDetailsSchema";
 
+// styles for textField
 const useStyles = makeStyles((theme) => ({
   textField: {
     "& .MuiInputBase-input": {
-      // Adjust padding as needed
     },
     "& .MuiInputLabel-root": {
       color: "black",
@@ -43,23 +41,26 @@ function PersonalDetails({
   handleBack,
   steps,
   activeStep,
-  isPersonalDetailsValid,
   setPersonalDetailsData,
   personalDetailsData,
 }) {
   const [profilePhoto, setProfilePhoto] = useState(null);
   const classes = useStyles();
+
+// setting all the data back to form
   useEffect(() => {
-   setAllTheData()
-  }, []);
+   setAllTheData() // call for setting data
+   console.log("Use effect")
+  }, [personalDetailsData]);
 
   // Function to handle file upload
   const handleFileUpload = (event) => {
     const file = event.target.files[0];
-    // console.log(file)
-    setProfilePhoto(URL.createObjectURL(file));
     formik.setFieldValue("profilePicture", file);
+    setProfilePhoto(URL.createObjectURL(file));
   };
+
+  // form intial Values
   const initialValues = {
     firstName: "",
     middleName: "",
@@ -80,10 +81,12 @@ function PersonalDetails({
     profilePicture: null,
   };
 
+  // submit form
   const onSubmit = (values) => {
-    console.log(values);
-    handleNext();
-    setPersonalDetailsData(values);
+    if(values){
+      handleNext();
+      setPersonalDetailsData(values);
+    }
   };
 
   const formik = useFormik({
@@ -91,15 +94,15 @@ function PersonalDetails({
     onSubmit,
     // validationSchema: PersonalDetailsSchema,
   });
+
   const setAllTheData=()=>{
     if (personalDetailsData != null) {
       formik.setValues(personalDetailsData);
       if (personalDetailsData.profilePicture) {
         setProfilePhoto(
-          URL.createObjectURL(personalDetailsData.profilePicture)
+          URL.createObjectURL(personalDetailsData.profilePicture) //setting profile photo
         );
       }
-      console.log(personalDetailsData, "useEffect");
     }
   }
 
@@ -118,7 +121,6 @@ function PersonalDetails({
                   display: "inline-block",
                   marginLeft: "45%",
                 }}
-
               >
                 <input
                   id="file-upload"
@@ -144,16 +146,11 @@ function PersonalDetails({
                       border: "1px solid black",
                       borderRadius: "50%",
                     }}
-
                   />
                   <PhotoCameraIcon
                     style={{ position: "absolute", bottom: 0, right: 0 }}
-              
-
                   />
                 </IconButton>
-
-               
               </div>
               {formik.errors.profilePicture && formik.touched.profilePicture &&
                   (
@@ -169,7 +166,6 @@ function PersonalDetails({
                 name="firstName"
                 placeholder=""
                 label="First Name"
-                //   className={classes.textField}
                 type="text"
                 onBlur={formik.handleBlur}
                 onChange={formik.handleChange}
@@ -315,11 +311,6 @@ function PersonalDetails({
                   onBlur={formik.handleBlur}
                   onChange={formik.handleChange}
                   error={formik.errors.gender && formik.touched.gender}
-                  // helperText={
-                  //   formik.errors.gender && formik.touched.gender
-                  //     ? formik.errors.gender
-                  //     : null
-                  // }
                 >
                   <MenuItem value="male">Male</MenuItem>
                   <MenuItem value="female">Female</MenuItem>
@@ -429,7 +420,6 @@ function PersonalDetails({
                 Bank Details
               </Typography>
             </Grid>
-
             <Grid item xs={6}>
               <TextField
                 fullWidth
@@ -533,7 +523,7 @@ function PersonalDetails({
                 color: "white",
                 marginBottom: "20px",
                 "&:hover": {
-                  backgroundColor: "#FF9933", // Set the desired color on hover
+                  backgroundColor: "#FF9933",
                 },
               }}
               disabled={!(formik.isValid)}

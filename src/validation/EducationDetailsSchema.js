@@ -12,14 +12,13 @@ export const educationDetailsValidation = Yup.object().shape({
     totalExperience: Yup.number().required("Total experience is required").typeError("Please enter a valid number").max(50, "Total experience cannot exceed 50"),
     experienceDetails:Yup.array().of(
       Yup.object().shape({
-        
         company: Yup.string().required("Company is required"),
         designation: Yup.string().required("Designation is required"),
         technology: Yup.string().required("Technology is required"),
-        fromDate: Yup.date().max(new Date(),"Please Enter valid date").typeError("From date is required"),
-        toDate: Yup.date().max(new Date(),"Please Enter valid date").typeError("To date is required"),
+        fromDate: Yup.date().required("From date is required").max(new Date(),"From Date should be less than current date").typeError("Please enter a valid date").max(Yup.ref("toDate"), "From date should not be greater than to date"),
+        toDate: Yup.date().required("To date is required").max(new Date(),"To date should be less than current date").typeError("Please enter a valid date").min(Yup.ref("fromDate"), "To date should not be less than start date"),
         reasonForJobChange: Yup.string().required("Reason for job change is required"),
-        checkBox: Yup.string().required("Checkbox is required"),
+        
       })
     )
   }) 

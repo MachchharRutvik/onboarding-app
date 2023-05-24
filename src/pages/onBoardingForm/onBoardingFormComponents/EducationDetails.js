@@ -3,18 +3,17 @@ import { Box, FormGroup, FormHelperText } from "@mui/material";
 import { Button } from "@mui/material";
 import { Typography } from "@mui/material";
 import { useFormik } from "formik";
-import * as Yup from "yup";
 import { Grid } from "@mui/material";
 import { Paper } from "@mui/material";
 import { TextField } from "@mui/material";
 import { MenuItem, Select, FormControl, InputLabel } from "@mui/material";
-
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Checkbox from "@mui/material/Checkbox";
 import { makeStyles } from "@mui/styles";
 import { v4 as uuid } from "uuid";
 import { educationDetailsValidation } from "../../../validation/EducationDetailsSchema";
 
+// styles for textField
 const useStyles = makeStyles((theme) => ({
   textField: {
     "& .MuiInputBase-input": {
@@ -45,10 +44,12 @@ function EducationDetails({
 }) {
   const classes = useStyles();
 
+  // Setting all the data back to form
   useEffect(() => {
-    setAllTheData();
-   }, []);
-  
+    setAllTheData(); // call for set data
+  }, []);
+
+  // all the select menu arrays
   const educationTypes = [
     "High School Diploma",
     "Associate's Degree",
@@ -78,7 +79,6 @@ function EducationDetails({
     "2020-21",
   ];
 
-  const experience = ["0-1", "2-5", "5-10", "10+"];
   const technologies = [
     "HTML",
     "CSS",
@@ -97,6 +97,7 @@ function EducationDetails({
     "PHP",
   ];
 
+  // form initial values
   const initialValues = {
     educationDetails: [
       {
@@ -110,7 +111,15 @@ function EducationDetails({
     ],
     totalExperience: "0",
   };
-  const handleAddFields = () => {
+
+  // submit form
+  const onSubmit = (values) => {
+    setEducationDetailsData(values);
+    handleNext();
+  };
+
+  // Function for dynamically Adding Education Fields on click of Add Education
+  const handleAddEducation = () => {
     formik.setValues({
       ...formik.values,
       educationDetails: [
@@ -126,6 +135,43 @@ function EducationDetails({
       ],
     });
   };
+
+  // Function for removing Education Fields
+  const handleRemoveEducation = (id) => {
+    let educationArray = formik.values.educationDetails.filter((ele) => {
+      return ele.id !== id;
+    });
+    formik.setValues({
+      ...formik.values,
+      educationDetails: educationArray,
+    });
+  };
+
+  // On the change of Total Experience adding experience fields dynamically
+  const handleChangeOfTotalExperience = (event) => {
+    const totalExperienceString = event.target.value;
+    // converting string to integer for checking condition
+    const totalExperience = parseInt(totalExperienceString);
+    formik.setFieldValue("totalExperience", totalExperienceString);
+    if (totalExperience > 0 && totalExperience <= 50) {
+      formik.setFieldValue("experienceDetails", [
+        {
+          id: uuid(),
+          company: "",
+          designation: "",
+          technology: "",
+          fromDate: "",
+          toDate: "",
+          reasonForJobChange: "",
+          checkBox: false,
+        },
+      ]);
+    } else {
+      formik.setFieldValue("experienceDetails", []);
+    }
+  };
+
+  // Function for dynamically Adding Experience Fields on click of add Experience
   const handleAddExperience = () => {
     formik.setValues({
       ...formik.values,
@@ -145,15 +191,7 @@ function EducationDetails({
     });
   };
 
-  const handleRemoveFields = (id) => {
-    let educationArray = formik.values.educationDetails.filter((ele) => {
-      return ele.id !== id;
-    });
-    formik.setValues({
-      ...formik.values,
-      educationDetails: educationArray,
-    });
-  };
+  // Function for removing Experience Fields
   const handleRemoveExperience = (id) => {
     console.log(id);
     if (formik.values.experienceDetails.length > 1) {
@@ -166,66 +204,42 @@ function EducationDetails({
       });
     }
   };
-  const onSubmit = (values) => {
-    setEducationDetailsData(values);
-    handleNext();
-  };
-  const handleBackButton = () => {
-    setEducationDetailsData(formik.values);
-    handleBack();
-  }
-  const formik = useFormik({
-    initialValues,
-    onSubmit,
-    validationSchema: educationDetailsValidation,
-  });
-
-
-  const setAllTheData =()=>{
-    if (educationDetailsData != null) {
-      formik.setValues(educationDetailsData);
-    }
-  }
-
-  const handleChangeOfTotalExperience = (event) => {
-    
-    const totalExperienceString = event.target.value;
-    const totalExperience = parseInt(totalExperienceString);
-
-    formik.setFieldValue("totalExperience", totalExperienceString);
-
-    if (totalExperience > 0 && totalExperience <= 50) {
-      formik.setFieldValue("experienceDetails", [
-        {
-          id: uuid(),
-          company: "",
-          designation: "",
-          technology: "",
-          fromDate: "",
-          toDate: "",
-          reasonForJobChange: "",
-          checkBox: false,
-        },
-      ]);
-    } else {
-      formik.setFieldValue("experienceDetails", []);
-    }
-  };
-
+  // Fuction for Checkbox of Company is present
   const handleCheckBox = (e, id) => {
-    console.log("ID", id);
-    // formik.handleChange(e)
+    formik.handleChange(e);
     const experienceArray = formik.values.experienceDetails.map((ele) => {
       if (ele.id === id) {
-        return { ...ele, checkBox: e.target.checked, toDate: "Present" };
-        
+        return {
+          ...ele,
+          checkBox: e.target.checked,
+          toDate: new Date().toLocaleDateString(), // setting the today's date for toDate
+        };
       } else {
         return ele;
       }
     });
     formik.setFieldValue("experienceDetails", experienceArray);
   };
-  console.log(formik.errors)
+
+  // Function for back button onClick of back set all the data to state
+  const handleBackButton = () => {
+    setEducationDetailsData(formik.values);
+    handleBack();
+  };
+
+  const formik = useFormik({
+    initialValues,
+    onSubmit,
+    // validationSchema: educationDetailsValidation,
+  });
+
+  // Function For setting data back to form
+  const setAllTheData = () => {
+    if (educationDetailsData != null) {
+      formik.setValues(educationDetailsData);
+    }
+  };
+
   return (
     <>
       <Paper elevation={3} sx={{ marginTop: "50px" }}>
@@ -237,7 +251,7 @@ function EducationDetails({
             size="small"
             variant="contained"
             sx={{ margin: "10px", backgroundColor: "#FF9933" }}
-            onClick={handleAddFields}
+            onClick={handleAddEducation}
           >
             Add Education
           </Button>
@@ -441,7 +455,7 @@ function EducationDetails({
                     sx={{ backgroundColor: "#FF9933" }}
                     size="small"
                     type="button"
-                    onClick={() => handleRemoveFields(education.id)}
+                    onClick={() => handleRemoveEducation(education.id)}
                   >
                     Remove
                   </Button>
@@ -695,7 +709,7 @@ function EducationDetails({
                     }}
                   />
                 </Grid>
-                {formik.values.experienceDetails[index].checkBox === false ? (
+                {formik.values.experienceDetails[index].checkBox === false && (
                   <Grid item xs={6}>
                     <TextField
                       fullWidth
@@ -730,7 +744,7 @@ function EducationDetails({
                       }}
                     />
                   </Grid>
-                ) : null}
+                )}
                 {index > 0 && (
                   <Grid item xs={1}>
                     <Button
@@ -773,7 +787,7 @@ function EducationDetails({
                   backgroundColor: "#FF9933", // Set the desired color on hover
                 },
               }}
-              disabled={!(formik.isValid)}
+              disabled={!formik.isValid}
             >
               {activeStep === steps.length - 1 ? "Finish" : "Next"}
             </Button>

@@ -12,13 +12,7 @@ import { useNavigate } from "react-router-dom";
 
 
 function Login() {
-  const Navigate = useNavigate();
-  const handleSubmit = () => {
-    console.log(formik.isValid)
-    if(formik.isValid && formik.values.password==="123"){
-      Navigate("/form");
-    }
-  }
+  const Navigate = useNavigate();  
   const formik = useFormik({
     initialValues: {
       password:''
@@ -26,14 +20,15 @@ function Login() {
     validationSchema: Yup.object({
       password: Yup.string().required("Password is required")
     }),
-    onSubmit: (values) => {
-      if(formik.isValid){
-        console.log(values);
-      }
+  onSubmit: (values) => {
+    if (values.password === "123") {
+      Navigate("/form");
+    } else {
+      formik.setErrors({ password: "Invalid Password" });
     }
+  } 
   })
  
-  console.log(formik.errors);
   return (
     <Box sx={{ display: "flex", justifyContent: "center", marginTop: "30px" }}>
       <Paper sx={{ width: "784px", height: "704px" }} elevation={5}>
@@ -80,12 +75,11 @@ function Login() {
                   : null
               }
             />
-         
           </form>
           <Divider />
           <Button
             variant="contained"
-            onClick={handleSubmit}
+            type="submit"
             sx={{
               width: "245px",
               height: "42px",
@@ -95,6 +89,7 @@ function Login() {
               borderRadius: "5px",
               fontSize: "16px",
             }}
+            onClick={formik.handleSubmit}
           >
             Login
           </Button>
