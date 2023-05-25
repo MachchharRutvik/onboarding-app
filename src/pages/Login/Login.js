@@ -80,7 +80,7 @@ function Login() {
           <Button
             variant="contained"
             type="submit"
-            sx={{
+            style={{
               width: "245px",
               height: "42px",
               marginLeft: "auto",
